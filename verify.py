@@ -36,7 +36,8 @@ for infile in corpus_ids:
   c = nltk.ConcordanceIndex(text.tokens)
   offsets = c.offsets(focal_word)
   
-  for offset in offsets:
+  if len(offsets) > 0:
+    offset = random.choice(offsets)
     print num_words, "/", num_words_max
     num_words += 1
     score_max = 0
