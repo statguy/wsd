@@ -26,11 +26,10 @@ for infile in corpus_ids:
   c = nltk.ConcordanceIndex(text.tokens)
   
   offsets = c.offsets(focal_word)
-  for offset in offsets:
+  if len(offsets) > 0:
+    offset = random.choice(offsets):
     print infile
     wsd.print_context(text, offset)
-    #context_words = text.tokens[map(lambda x: x-5 if (x-offset_margin) > 0 else 0, [offset])[0]:offset+offset_margin]
-    #print context_words
     
     i = 1
     for sense in senses:
