@@ -7,6 +7,7 @@ from nltk.corpus.reader.plaintext import PlaintextCorpusReader
 from nltk.text import *
 import csv
 import random
+from collections import Counter
 
 if len(sys.argv) != 4:
   print "Usage:", sys.argv[0], "word sense1 sense2"
@@ -27,7 +28,7 @@ for infile in corpus_ids:
   
   offsets = c.offsets(focal_word)
   if len(offsets) > 0:
-    offset = random.choice(offsets):
+    offset = random.choice(offsets)
     print infile
     wsd.print_context(text, offset)
     
@@ -44,6 +45,10 @@ for infile in corpus_ids:
       if key.isdigit() and int(key) > 0 and int(key) <= len(senses):
         word_sense_list.append( (infile, offset, senses[int(key)-1]) )
         print infile, offset, senses[int(key)-1]
+        
+        sense_freq = Counter(elem[2] for elem in word_sense_list)
+        print sense_freq
+        
         break
       elif key == "q":
         quit = True
