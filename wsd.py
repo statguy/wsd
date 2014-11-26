@@ -46,9 +46,9 @@ class DecisionList(object):
   def get_senses_score(self, tokens, collocation_object_index):
     score_max = 0
     senses_max = None
+    ambiguous = False
     
     for token in tokens:
-      #kv = { k:v for k,v in self.decision_items.iteritems() if ",".join(["", token, ""]) in k }
       kv = { k:v for k,v in self.decision_items.iteritems() if k.endswith(",".join(["", token, str(collocation_object_index)])) }
       if len(kv) == 0: return None # No sense assigned
       keys, scores = kv.keys(), kv.values()
@@ -56,8 +56,12 @@ class DecisionList(object):
       if scores[0] > score_max:
         score_max = scores[0]
         senses_max = senses
+        if len(scores) > 1:
+          ambiguous = True
+        else:
+          ambiguous = False
     
-    return [ senses_max, score_max ]
+    return [ senses_max, score_max, ambiguous ]
     
 
 class Collocation(object):
@@ -130,5 +134,6 @@ class BigramScope(Collocation):
 
 
 def print_context(text, offset, offset_margin=20):
-  print text.tokens[map(lambda x: x-5 if (x-offset_margin) > 0 else 0, [offset])[0]:offset+offset_margin]
+  #print " ".join(text.tokens[map(lambda x: x-5 if (x-offset_margin) > 0 else 0, [offset])[0]:offset+offset_margin])
+  print " ".join(text.tokens[ max(offset-offset_margin, 0) : min(offset+offset_margin, len(text.tokens)) ])
   

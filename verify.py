@@ -19,21 +19,29 @@ corpus = PlaintextCorpusReader('outcorpus/', '.*')
 collocations = [ wsd.BigramLeft(senses, 0), wsd.BigramRight(senses, 1), wsd.BigramScope(senses, 2, [2, 10]) ]
 decision_list = wsd.DecisionList()
 decision_list.load("senses_bootstrap_" + focal_word + ".csv")
+corpus_ids = corpus.fileids()
+random.shuffle(corpus_ids)
 
-corpus_random = [corpus.fileids()[ random.randint(0, len(corpus.fileids())) ] for p in range(0, 100)]
-i = 0
-for infile in sorted(corpus_random):
-  print i, "/", len(corpus_random)
-  i += 1
-  
+num_words = 1
+num_words_max = 100
+tagged = 0
+ambiguous = 0
+unknown = 0
+
+for infile in corpus_ids:
+  if num_words > num_words_max: break
+
   words = corpus.words(infile)
   text = Text(words)
   c = nltk.ConcordanceIndex(text.tokens)
   offsets = c.offsets(focal_word)
   
   for offset in offsets:
+    print num_words, "/", num_words_max
+    num_words += 1
     score_max = 0
     senses_max = None
+    ambiguous_max = False
     
     for collocation in collocations:
       tokens = collocation.get_collocation(text, offset)
@@ -45,7 +53,20 @@ for infile in sorted(corpus_random):
       if score_max < senses_score[1]:
         score_max = senses_score[1]
         senses_max = senses_score[0]
+        ambiguous_max = senses_score[2]
     
-    print senses_max, score_max
-    if senses_max != None:
-      wsd.print_context(text, offset)
+    if senses_max == None:
+      unknown += 1
+    else:
+      if ambiguous_max == True:
+        ambiguous += 1
+      else:
+        tagged += 1
+
+    print senses_max, score_max, "ambiguous = ", ambiguous_max
+    wsd.print_context(text, offset)
+
+  if len(offsets) > 0:
+    print "--------------------------------------------------------"
+
+print "Tagged =", tagged, "ambiguous =", ambiguous, "unknown =", unknown

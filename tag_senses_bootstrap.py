@@ -9,8 +9,8 @@ if len(sys.argv) != 4:
   print "Usage:", sys.argv[0], "word sense1 sense2"
   exit(-1)
 
-focal_word = sys.argv[2]
-senses = [sys.argv[3], sys.argv[4]]
+focal_word = sys.argv[1]
+senses = [sys.argv[2], sys.argv[3]]
 #focal_word = "plant"
 #senses = ["manufacturing","life"]
 corpus = PlaintextCorpusReader('outcorpus/', '.*')
